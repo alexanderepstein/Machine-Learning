@@ -4,7 +4,7 @@ from kNN import *
 
 if __name__ == "__main__":
 
-    hoRatio = 0.10
+    hoRatio = 0.50
     datingDataMat,datingLabels,datingNumLabels = file2matrix('datingTestSet.txt')
     normMat, ranges, minVal = autoNorm(datingDataMat)
     m = normMat.shape[0]

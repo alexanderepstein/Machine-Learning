@@ -1,6 +1,6 @@
 import operator
 from numpy import *
-
+from os import listdir
 
 """
 This function creates a siimple dataset and corresponding list of classifcations
@@ -27,7 +27,7 @@ def classify0(inX, dataSet, labels, k):
     diffMat = tile(inX, (dataSetSize, 1)) - dataSet
     sqDiffMat = diffMat**2
     sqDistances = sqDiffMat.sum(axis=1)
-    distances = sqDistances**.05
+    distances = sqDistances**0.5
     sortedDistIndicies = distances.argsort()
     classCount = {}
     for i in range(k):
@@ -101,3 +101,31 @@ def img2vector(filename):
         for j in range(32):
             returnVect[0,32*i+j] = int(lineStr[j])
     return returnVect
+
+
+
+def handwritingClassTest():
+    hwLabels = []
+    trainingFileList = listdir('trainingDigits')
+    m = len(trainingFileList)
+    trainingMat = zeros((m,1024))
+    for i in range(m):
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        trainingMat[i,:] = img2vector('trainingDigits/%s' % fileNameStr)
+    testFileList = listdir('testDigits')
+    errorCount = 0.0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        fileNameStr = testFileList[i]
+        fileStr = fileNameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        vectorUnderTest = img2vector('testDigits/%s' % fileNameStr)
+        classiferResult = classify0(vectorUnderTest,trainingMat,hwLabels,3)
+        print("The classifer came back with: %d, the real answer is: %d %s" % (classiferResult,classNumStr,classiferResult==classNumStr))
+        if (classiferResult != classNumStr):
+            errorCount += 1.0
+    print("\nThe total number of errors is: %d\n" % errorCount)
+    print("The total error rate is: %f" % (errorCount/float(mTest)))
